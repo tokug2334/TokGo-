@@ -1,0 +1,13 @@
+workflows:
+  tokgo-android:
+    name: TokGo Android APK
+    max_build_duration: 60
+    environment:
+      java: 17
+    scripts:
+      - name: Build TokGo APK
+        script: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
