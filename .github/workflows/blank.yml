@@ -1,0 +1,48 @@
+
+name: Build TokGo APK
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout TokGo
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Show project structure
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -name "gradlew" -o -name "settings.gradle*" -o -name "build.gradle*"
+
+      - name: Build TokGo
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            ./gradlew assembleDebug --no-daemon
+          elif [ -f "./app/gradlew" ]; then
+            cd app
+            chmod +x ./gradlew
+            ./gradlew assembleDebug --no-daemon
+          else
+            echo "ERROR: gradlew was not found."
+            exit 1
+          fi
+
+      - name: Upload TokGo APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TokGo-APK
+          path: "**/build/outputs/apk/debug/*.apk"
+          if-no-files-found: error
